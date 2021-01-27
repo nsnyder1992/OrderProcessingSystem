@@ -7,7 +7,7 @@ The objective of this project is to decribe how to implement a Order Processing 
 In this section each model needed for this system will be described. These Models will be stored in a database and then accessed and manipulate via a controller. 
 
 ### Ingredients
-These will be the lowest level of the classes that make up the Recipes and will be mainly used to keep inventory of all the
+These will be the lowest level of the classes that make up the Recipes 
 Attributes:
 - id::Integer
 - name::String
@@ -80,18 +80,101 @@ Attributes:
   - name::String
   
 ### ComboFoods
-One to Many Relationship between Combos and its assoiciated 
+One to Many Relationship between Combos and its assoiciated FoodItems
 Attributes:
   -comboId::Integer
-  -foodId::Integer
+  -foodItemId::Integer
+  
+## Classes
+This section will decribes classes that will be temporary used with in the application to store information until it is not needed anymore
+
+### Order
+Attributes:
+  - id::Integer
+  - name::String //name on order
+  - order::HashMap<FoodItem, Interger> //<key: FoodItem, value: quantity>
+
+Methods:
+  - addItem(int qty, String item){
+     //Look up the if item in database and qty not null
+        //update/add FoodItem, qty += qty in order HashMap
+    }
+    
+    - removeItem(int qty, String item){
+     //Looks up the if item in database and qty not null
+        //update/add FoodItem, qty -= qty in order HashMap if qty - qty >= 0 else 0
+    }
+    
+  - addCombo(int qty, String combo){
+     //query Combo model with name == combo
+     //if query not null and qty not null
+        //get all food items from query and
+          //update/add FoodItem and qty += qty_from_query * qty in order HashMap
+    }
+    
+    - removeCombo(int qty, String item){
+     //query Combo model with name == combo
+     //if query not null and qty not null
+        //get all food items from query and
+          //update/add FoodItem and qty += qty_from_query * qty in order HashMap if qty - qty >= 0 else 0
+    }
 
 
 ## Controllers
-This section will decribe controllers and their methods
+This section will decribes controllers and their methods
 
 ### OrderController
+Attributes:
+  - private static idIndexer::Integer // this will increase each time a Order is created, reset by crontab method after midnight
+  - orderQueue::LinkedList<Order> // this will keep the orders in a FIFO 
+  - inProcessList::LinkedList<Order> // this will keep the orders that are being processed by the Chefs but might not be FIFO depending on prepare time so this is just a list
+  - completedQueue::LinkedList<Order> // this will keep the orders that are Completed waiting for the waiter to deliver
+  - deliveredList::LinkedList<Order> // this will keep the orders that are delivered until waiter sees customer leave, in case of customer rejection
 
-### OrderProcessingSystem
+Methods:
+  - sendOrder(Order order) {
+      // add order to orderQueue
+    }
+    
+  - processOrder() {
+      // remove first order from orderQueue
+      // add to inProcessQueue
+    }
+    
+  - completeOrder(Order order) {
+      // add to completedQueue
+      // remove order from inProcessQueue
+    }
+    
+  - deliveredOrder(Order order) {
+      // add to deliverdList
+      // remove order from completeQueue
+    }
+    
+  - deleteOrder(Order order) {
+      //remove order from deliverdList
+     }
+     
+  - updateOrder(int orderId) {
+      //traverse OrderQueue
+     }
+
+#### Cashier Work Flow with regard to Order Processing
+This will allow a User of type "Cashier" to Create and Read an Order and submit it to the OrderQueue. If the order is still in the OrderQueue, and not in the inProcessQueue or completedQueue, the Cashier will be able to Update and Delete an Order. The Cashier Workflow is the following:
+
+1) Cashier creates a new instance of the Order class
+2) uses an Order.addItem() method to add an item to the Order
+3) uses a Order.removeItem() method to remove an item, if total quantity not < 0
+4) uses an Order.addCombo() method to add items within a combo
+5) uses a Order.removeCombo() method to remove an item, if total quantity not < 0
+6) when customer is satisfied send order to order queue
+7) If customer decided to change the order and it is still within the orderQueue then the Cashier can update
+8)
+
+### MenuController
+This will allow a User of type "Cashier" to Create and Read an Order and submit it to the OrderQueue. If the order is still in the OrderQueue, and not in the inProcessQueue or completedQueue, the Cashier will be able to Update and Delete an Order. 
+
+### OrderQueue
 
 That will allow the cashier to add Orders given an orderId and the order. The orderId's will be stored in a queue based on a optimazation Algorthim. The next Order in the queue will be processed by the next availble Robot Chef. 
 
