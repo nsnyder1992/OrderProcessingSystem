@@ -8,124 +8,156 @@ In this section each model needed for this system will be described. These Model
 
 ### Ingredients
 These will be the lowest level of the classes that make up the Recipes 
+
 Attributes:
-- id::Integer
-- name::String
-- inventoryQty::Integer
+
+    id::Integer
+    name::String
+    inventoryQty::Integer
 
 ### Prepare
 These prepare models describe what to do to ingredients to make a FoodItem. For example "Cook". The reason applianceId is needed is sometimes
+
 Attributes:
-- id::Integer
-- name::String
+
+    id::Integer
+    name::String
 
 ### Utility
 The Utility model will specify what should be used to Prepare the ingredients, ie "Oven", "Knife", etc
+
 Attributes:
-- id::Integer
-- name::String
+
+    id::Integer
+    name::String
 
 ### RecipeIngredients
 This is a One-to-many type relationship model where there will be 1 Recipe to many ingredients 
+
 Attributes:
-- recipeId::Integer
-- ingredientId::Integer
-- qty::Integer
-- units::String
+
+    recipeId::Integer
+    ingredientId::Integer
+    qty::Integer
+    units::String
 
 ### ReciepeSteps
 This will be a One-to-many type relationship model where there will be 1 Reciepe to many steps including prepare, utilities, and ingredients
-- recipeId::Integer
-- stepNum::Integer          //which step we are on
-- prepareId::Integer
-- utiltityId::Integer
-- ingredientId::Integer
-- mixWithNext::boolean      //if true mix with the next in line, can sequence this to mix as many ingredients at one time
-- timeToPrepare::Integer    //seconds
-- timeToFlip::Integer       //when to interupt to flip burgers, steaks,etc
-- conccurent::boolean       //if other processes can be done conncurrently, then set to true. Like waiting on brownies in the oven
+
+Attributes:
+
+    recipeId::Integer
+    stepNum::Integer          //which step we are on
+    prepareId::Integer
+    utiltityId::Integer
+    ingredientId::Integer
+    qty::Integer
+    units::String
+    mixWithNext::boolean      //if true mix with the next in line, can sequence this to mix as many ingredients at one time
+    timeToPrepare::Integer    //seconds
+    timeToFlip::Integer       //when to interupt to flip burgers, steaks,etc
+    conccurent::boolean       //if other processes can be done conncurrently, then set to true. Like waiting on brownies in the oven
 
 Might need to add more things above to account for more actions, but the general idea is to save the ReciepeSteps in the database to help calculate optimum amount of time and space within the Cafeteria Kitchen. 
 
 ### User
+
 These will be the lowest level of the classes that make up the Recipes and will be mainly used to keep inventory of all the
+
 Attributes:
-- id::Integer
-- name::String
-- password::hashed<String>
-- isRobot::boolean            //if robot true
-- securityLevelId::Integer    //from SecurityLevel model
+
+    id::Integer
+    name::String
+    password::hashed<String>
+    isRobot::boolean            //if robot true
+    securityLevelId::Integer    //from SecurityLevel model
 
 ### SecurityLevel
+
 SecurityLevels will allow the program to determine who is allowed to do what
+
 Attributes:
-- id::Integer
-- name::String //"Admin", "Cashier", "Chefs", "Waiters"
+
+    id::Integer
+    name::String //"Admin", "Cashier", "Chefs", "Waiters"
 
 ### MenuType
+
 Attributes:
-  - id::Integer
-  - name::String //"Dinner", "Dessert", "Sides", etc
+
+    id::Integer
+    name::String //"Dinner", "Dessert", "Sides", etc
 
 ### FoodItem
+
 Attributes:
-  - id::Integer
-  - name::String            //"Hamburger", "Chicken Sandwich", etc
-  - reciepeId::Integer      //from Reciepe Model
-  - menuTypeId::Integer     //from MenuType Model
+
+    id::Integer
+    name::String            //"Hamburger", "Chicken Sandwich", etc
+    reciepeId::Integer      //from Reciepe Model
+    menuTypeId::Integer     //from MenuType Model
 
 ### Combos
+
 Attributes:
-  - id::Integer
-  - name::String
+
+    id::Integer
+    name::String
   
 ### ComboFoods
 One to Many Relationship between Combos and its assoiciated FoodItems
+
 Attributes:
-  -comboId::Integer
-  -foodItemId::Integer
+
+    comboId::Integer
+    foodItemId::Integer
   
 ## Temporay Class Models
+
 This section will decribes classes that will be temporary used with in the application to store information until it is no longer needed
 
 ### Order
+
 Attributes:
-  - id::Integer
-  - name::String                          //name on order
-  - order::HashMap<FoodItem, Interger>    //<key: FoodItem, value: quantity>
+
+    id::Integer
+    name::String                          //name on order
+    order::HashMap<FoodItem, Interger>    //<key: FoodItem, value: quantity>
 
 Methods:
 
-Constructor(id)       //this.id = id
-    
-setName(String name) //this.name = name
-    
-addItem(int qty, String item){
-  if item in database and qty not null {
-    update/add key: item, value: qty  += qty in order HashMap
-  }
-}
+    Constructor(id)       //this.id = id
 
-    - removeItem(int qty, String item){
+    setName(String name) //this.name = name
+    
+    addItem(int qty, String item){
+      if item in database and qty not null {
+        // update/add key: item, value: qty  += qty in order HashMap
+      }
+    }
+
+    removeItem(int qty, String item){
         if item in database and qty not null {
-          update/add key: item, value: qty -= qty in order HashMap if qty - qty >= 0 else 0
+          // update/add key: item, value: qty -= qty in order HashMap if qty - qty >= 0 else 0
         }
     }
     
-  - addCombo(int qty, String combo){
-     query = query Combo model where name == combo
-     if query not null and qty not null
-        get all food items from query
-        for item in foodItems {
-          update/add key: item, value: qty  += qty_from_query * qty in order HashMap
+    addCombo(int qty, String combo){
+       query = query Combo model where name == combo
+       if query not null and qty not null
+          foodItems = get all food items from query
+          for item in foodItems {
+            // update/add key: item, value: qty  += qty_from_query * qty in order HashMap
         }
-    }
+     }
     
-    - removeCombo(int qty, String item){
-     //query Combo model with name == combo
-     //if query not null and qty not null
-        //get all food items from query and
-          //update/add FoodItem and qty += qty_from_query * qty in order HashMap if qty - qty >= 0 else 0
+    removeCombo(int qty, String item){
+       query = query Combo model where name == combo
+       if query not null and qty not null
+          foodItems = get all food items from query
+          for item in foodItems {
+            // update/add key: item, value: qty  -= qty_from_query * qty in order HashMap if qty - qty_from_query * qty >= 0 else 0
+        }
     }
 
 
@@ -134,50 +166,52 @@ This section will decribes controllers and their methods
 
 ### OrderController
 Attributes:
-  - private static idIndexer::Integer     // this will increase each time a Order is created, reset by crontab method after midnight, this can be accessed by all class instances
-  - orderQueue::LinkedList<Order>         // this will keep the orders in a FIFO 
-  - inProcessList::LinkedList<Order>      // this will keep the orders that are being processed by the Chefs but might not be FIFO depending on prepare time so this is just a list
-  - completedQueue::LinkedList<Order>     // this will keep the orders that are Completed waiting for the waiter to deliver
-  - deliveredList::LinkedList<Order>      // this will keep the orders that are delivered until waiter sees customer leave, in case of customer rejection
-  - statusMap::HashMap<Integer, Integer>  //key: orderId, value: "1" = orderQueue | "2" = inProcessList | "3" = completedQueue | "4" = deliveredList
+
+    private static idIndexer::Integer     // this will increase each time a Order is created, reset by crontab method after midnight, this can be accessed by all class instances
+    orderQueue::LinkedList<Order>         // this will keep the orders in a FIFO 
+    inProcessList::LinkedList<Order>      // this will keep the orders that are being processed by the Chefs but might not be FIFO depending on prepare time so this is just a list
+    completedQueue::LinkedList<Order>     // this will keep the orders that are Completed waiting for the waiter to deliver
+    deliveredList::LinkedList<Order>      // this will keep the orders that are delivered until waiter sees customer leave, in case of customer rejection
+    statusMap::HashMap<Integer, Integer>  //key: orderId, value: "1" = orderQueue | "2" = inProcessList | "3" = completedQueue | "4" = deliveredList
 
 Methods:
 
-  - createOrder() {
-    //idIndexer++
-    //return new Order(idIndexer)
-  }
+    createOrder() {
+        //idIndexer++
+        //return new Order(idIndexer)
+     }
     
-  - sendOrder(Order order) {
+    sendOrder(Order order) {
       // add order to orderQueue
+      // add key: order.id, value: "1" to statusMap
     }
     
-  - processOrder() {
+    processOrder() {
       // remove first order from orderQueue
       // add to inProcessQueue
     }
     
-  - completeOrder(Order order) {
+    completeOrder(Order order) {
       // add to completedQueue
       // remove order from inProcessQueue
     }
     
-  - deliveredOrder(Order order) {
+    deliveredOrder(Order order) {
       // add to deliverdList
       // remove order from completeQueue
     }
     
-  - deleteOrder(Order order) {
+    deleteOrder(Order order) {
       //remove order from deliverdList
      }
      
-  - updateOrder(int orderId) {
+    updateOrder(int orderId) {
       //traverse OrderQueue until orderId matches O
      }
    
-  -resetIndexer() {
+    resetIndexer() {
       //idIndexer = 0
-    }
+     }
 
 #### Cashier Work Flow with regard to Order Processing
 This will allow a User of type "Cashier" to Create and Read an Order and submit it to the OrderQueue. If the order is still in the OrderQueue, and not in the inProcessQueue or completedQueue, the Cashier will be able to Update and Delete an Order. The Cashier Workflow is the following:
