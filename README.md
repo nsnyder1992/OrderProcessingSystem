@@ -36,14 +36,14 @@ Attributes:
 ### ReciepeSteps
 This will be a One-to-many type relationship model where there will be 1 Reciepe to many steps including prepare, utilities, and ingredients
 - recipeId::Integer
-- stepNum::Integer //which step we are on
+- stepNum::Integer          //which step we are on
 - prepareId::Integer
 - utiltityId::Integer
 - ingredientId::Integer
-- mixWithNext::boolean //if true mix with the next in line, can sequence this to mix as many ingredients at one time
-- timeToPrepare::Integer //seconds
-- timeToFlip::Integer //when to interupt to flip burgers, steaks,etc
-- conccurent::boolean //if other processes can be done conncurrently, then set to true. Like waiting on brownies in the oven
+- mixWithNext::boolean      //if true mix with the next in line, can sequence this to mix as many ingredients at one time
+- timeToPrepare::Integer    //seconds
+- timeToFlip::Integer       //when to interupt to flip burgers, steaks,etc
+- conccurent::boolean       //if other processes can be done conncurrently, then set to true. Like waiting on brownies in the oven
 
 Might need to add more things above to account for more actions, but the general idea is to save the ReciepeSteps in the database to help calculate optimum amount of time and space within the Cafeteria Kitchen. 
 
@@ -53,8 +53,8 @@ Attributes:
 - id::Integer
 - name::String
 - password::hashed<String>
-- isRobot::boolean //if robot true
-- securityLevelId::Integer //from SecurityLevel model
+- isRobot::boolean            //if robot true
+- securityLevelId::Integer    //from SecurityLevel model
 
 ### SecurityLevel
 SecurityLevels will allow the program to determine who is allowed to do what
@@ -70,9 +70,9 @@ Attributes:
 ### FoodItem
 Attributes:
   - id::Integer
-  - name::String //"Hamburger", "Chicken Sandwich", etc
-  - reciepeId::Integer //from Reciepe Model
-  - menuTypeId::Integer //from MenuType Model
+  - name::String            //"Hamburger", "Chicken Sandwich", etc
+  - reciepeId::Integer      //from Reciepe Model
+  - menuTypeId::Integer     //from MenuType Model
 
 ### Combos
 Attributes:
@@ -91,29 +91,34 @@ This section will decribes classes that will be temporary used with in the appli
 ### Order
 Attributes:
   - id::Integer
-  - name::String //name on order
-  - order::HashMap<FoodItem, Interger> //<key: FoodItem, value: quantity>
+  - name::String                          //name on order
+  - order::HashMap<FoodItem, Interger>    //<key: FoodItem, value: quantity>
 
 Methods:
-  - Constructor(id){
-      this.id = id
-    }
+
+Constructor(id)       //this.id = id
     
-  - addItem(int qty, String item){
-     //Look up the if item in database and qty not null
-        //update/add FoodItem, qty += qty in order HashMap
-    }
+setName(String name) //this.name = name
     
+addItem(int qty, String item){
+  if item in database and qty not null {
+    update/add key: item, value: qty  += qty in order HashMap
+  }
+}
+
     - removeItem(int qty, String item){
-     //Looks up the if item in database and qty not null
-        //update/add FoodItem, qty -= qty in order HashMap if qty - qty >= 0 else 0
+        if item in database and qty not null {
+          update/add key: item, value: qty -= qty in order HashMap if qty - qty >= 0 else 0
+        }
     }
     
   - addCombo(int qty, String combo){
-     //query Combo model with name == combo
-     //if query not null and qty not null
-        //get all food items from query and
-          //update/add FoodItem and qty += qty_from_query * qty in order HashMap
+     query = query Combo model where name == combo
+     if query not null and qty not null
+        get all food items from query
+        for item in foodItems {
+          update/add key: item, value: qty  += qty_from_query * qty in order HashMap
+        }
     }
     
     - removeCombo(int qty, String item){
@@ -129,12 +134,12 @@ This section will decribes controllers and their methods
 
 ### OrderController
 Attributes:
-  - private static idIndexer::Integer // this will increase each time a Order is created, reset by crontab method after midnight, this can be accessed by all class instances
-  - orderQueue::LinkedList<Order> // this will keep the orders in a FIFO 
-  - inProcessList::LinkedList<Order> // this will keep the orders that are being processed by the Chefs but might not be FIFO depending on prepare time so this is just a list
-  - completedQueue::LinkedList<Order> // this will keep the orders that are Completed waiting for the waiter to deliver
-  - deliveredList::LinkedList<Order> // this will keep the orders that are delivered until waiter sees customer leave, in case of customer rejection
-  - statusMap::HashMap<Integer, Integer> // this 
+  - private static idIndexer::Integer     // this will increase each time a Order is created, reset by crontab method after midnight, this can be accessed by all class instances
+  - orderQueue::LinkedList<Order>         // this will keep the orders in a FIFO 
+  - inProcessList::LinkedList<Order>      // this will keep the orders that are being processed by the Chefs but might not be FIFO depending on prepare time so this is just a list
+  - completedQueue::LinkedList<Order>     // this will keep the orders that are Completed waiting for the waiter to deliver
+  - deliveredList::LinkedList<Order>      // this will keep the orders that are delivered until waiter sees customer leave, in case of customer rejection
+  - statusMap::HashMap<Integer, Integer>  //key: orderId, value: "1" = orderQueue | "2" = inProcessList | "3" = completedQueue | "4" = deliveredList
 
 Methods:
 
@@ -177,14 +182,14 @@ Methods:
 #### Cashier Work Flow with regard to Order Processing
 This will allow a User of type "Cashier" to Create and Read an Order and submit it to the OrderQueue. If the order is still in the OrderQueue, and not in the inProcessQueue or completedQueue, the Cashier will be able to Update and Delete an Order. The Cashier Workflow is the following:
 
-1) Cashier creates a new instance of the Order class using createOrder()
-2) uses an Order.addItem() method to add an item to the Order
-3) uses a Order.removeItem() method to remove an item, if total quantity not < 0
-4) uses an Order.addCombo() method to add items within a combo
-5) uses a Order.removeCombo() method to remove an item, if total quantity not < 0
-6) when customer is satisfied the Cashier can send order to order queue
-7) If customer decided to change the order and it is still within the orderQueue then the Cashier can update
-8) If customer decided to delete the order and it is still within the orderQueue then the Cashier can update
+1. Cashier creates a new instance of the Order class using createOrder()
+2. uses an Order.addItem() method to add an item to the Order
+3. uses a Order.removeItem() method to remove an item, if total quantity not < 0
+4. uses an Order.addCombo() method to add items within a combo
+5. uses a Order.removeCombo() method to remove an item, if total quantity not < 0
+6. when customer is satisfied the Cashier can send order to order queue
+7. If customer decided to change the order and it is still within the orderQueue then the Cashier can update
+8. If customer decided to delete the order and it is still within the orderQueue then the Cashier can update
 
 #### Chef Work Flow with regard to Order Processing
 This will allow a User of type "Cashier" to Create and Read an Order and submit it to the OrderQueue. If the order is still in the OrderQueue, and not in the inProcessQueue or completedQueue, the Cashier will be able to Update and Delete an Order. The Cashier Workflow is the following:
