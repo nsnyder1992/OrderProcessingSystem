@@ -64,15 +64,15 @@ Attributes:
 
 ### MenuType
 Attributes:
-  -id::Integer
-  -name::String //"Dinner", "Dessert", "Sides", etc
+  - id::Integer
+  - name::String //"Dinner", "Dessert", "Sides", etc
 
 ### FoodItem
 Attributes:
-  -id::Integer
-  -name::String //"Hamburger", "Chicken Sandwich", etc
-  -reciepeId::Integer //from Reciepe Model
-  -menuTypeId::Integer //from MenuType Model
+  - id::Integer
+  - name::String //"Hamburger", "Chicken Sandwich", etc
+  - reciepeId::Integer //from Reciepe Model
+  - menuTypeId::Integer //from MenuType Model
 
 ### Combos
 Attributes:
@@ -85,8 +85,8 @@ Attributes:
   -comboId::Integer
   -foodItemId::Integer
   
-## Classes
-This section will decribes classes that will be temporary used with in the application to store information until it is not needed anymore
+## Temporay Class Models
+This section will decribes classes that will be temporary used with in the application to store information until it is no longer needed
 
 ### Order
 Attributes:
@@ -95,6 +95,10 @@ Attributes:
   - order::HashMap<FoodItem, Interger> //<key: FoodItem, value: quantity>
 
 Methods:
+  - Constructor(id){
+      this.id = id
+    }
+    
   - addItem(int qty, String item){
      //Look up the if item in database and qty not null
         //update/add FoodItem, qty += qty in order HashMap
@@ -125,13 +129,20 @@ This section will decribes controllers and their methods
 
 ### OrderController
 Attributes:
-  - private static idIndexer::Integer // this will increase each time a Order is created, reset by crontab method after midnight
+  - private static idIndexer::Integer // this will increase each time a Order is created, reset by crontab method after midnight, this can be accessed by all class instances
   - orderQueue::LinkedList<Order> // this will keep the orders in a FIFO 
   - inProcessList::LinkedList<Order> // this will keep the orders that are being processed by the Chefs but might not be FIFO depending on prepare time so this is just a list
   - completedQueue::LinkedList<Order> // this will keep the orders that are Completed waiting for the waiter to deliver
   - deliveredList::LinkedList<Order> // this will keep the orders that are delivered until waiter sees customer leave, in case of customer rejection
+  - statusMap::HashMap<Integer, Integer> // this 
 
 Methods:
+
+  - createOrder() {
+    //idIndexer++
+    //return new Order(idIndexer)
+  }
+    
   - sendOrder(Order order) {
       // add order to orderQueue
     }
@@ -156,20 +167,48 @@ Methods:
      }
      
   - updateOrder(int orderId) {
-      //traverse OrderQueue
+      //traverse OrderQueue until orderId matches O
      }
+   
+  -resetIndexer() {
+      //idIndexer = 0
+    }
 
 #### Cashier Work Flow with regard to Order Processing
 This will allow a User of type "Cashier" to Create and Read an Order and submit it to the OrderQueue. If the order is still in the OrderQueue, and not in the inProcessQueue or completedQueue, the Cashier will be able to Update and Delete an Order. The Cashier Workflow is the following:
 
-1) Cashier creates a new instance of the Order class
+1) Cashier creates a new instance of the Order class using createOrder()
 2) uses an Order.addItem() method to add an item to the Order
 3) uses a Order.removeItem() method to remove an item, if total quantity not < 0
 4) uses an Order.addCombo() method to add items within a combo
 5) uses a Order.removeCombo() method to remove an item, if total quantity not < 0
-6) when customer is satisfied send order to order queue
+6) when customer is satisfied the Cashier can send order to order queue
 7) If customer decided to change the order and it is still within the orderQueue then the Cashier can update
-8)
+8) If customer decided to delete the order and it is still within the orderQueue then the Cashier can update
+
+#### Chef Work Flow with regard to Order Processing
+This will allow a User of type "Cashier" to Create and Read an Order and submit it to the OrderQueue. If the order is still in the OrderQueue, and not in the inProcessQueue or completedQueue, the Cashier will be able to Update and Delete an Order. The Cashier Workflow is the following:
+
+1) Cashier creates a new instance of the Order class using createOrder()
+2) uses an Order.addItem() method to add an item to the Order
+3) uses a Order.removeItem() method to remove an item, if total quantity not < 0
+4) uses an Order.addCombo() method to add items within a combo
+5) uses a Order.removeCombo() method to remove an item, if total quantity not < 0
+6) when customer is satisfied the Cashier can send order to order queue
+7) If customer decided to change the order and it is still within the orderQueue then the Cashier can update
+8) If customer decided to delete the order and it is still within the orderQueue then the Cashier can update
+
+#### Cashier Work Flow with regard to Order Processing
+This will allow a User of type "Cashier" to Create and Read an Order and submit it to the OrderQueue. If the order is still in the OrderQueue, and not in the inProcessQueue or completedQueue, the Cashier will be able to Update and Delete an Order. The Cashier Workflow is the following:
+
+1) Cashier creates a new instance of the Order class using createOrder()
+2) uses an Order.addItem() method to add an item to the Order
+3) uses a Order.removeItem() method to remove an item, if total quantity not < 0
+4) uses an Order.addCombo() method to add items within a combo
+5) uses a Order.removeCombo() method to remove an item, if total quantity not < 0
+6) when customer is satisfied the Cashier can send order to order queue
+7) If customer decided to change the order and it is still within the orderQueue then the Cashier can update
+8) If customer decided to delete the order and it is still within the orderQueue then the Cashier can update
 
 ### MenuController
 This will allow a User of type "Cashier" to Create and Read an Order and submit it to the OrderQueue. If the order is still in the OrderQueue, and not in the inProcessQueue or completedQueue, the Cashier will be able to Update and Delete an Order. 
