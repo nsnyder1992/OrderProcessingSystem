@@ -120,15 +120,23 @@ This section will decribes classes that will be temporary used with in the appli
 
 Attributes:
 
-    id::Integer
+    private id::Integer
     name::String                          //name on order
     order::HashMap<FoodItem, Interger>    //<key: FoodItem, value: quantity>
 
 Methods:
 
-    Constructor(id)       //this.id = id
+    Constructor(id) {
+        this.id = id;
+    }
 
-    setName(String name) //this.name = name
+    setName(String name) {
+        this.name = name;
+    }
+    
+    getName(String name) {
+       return this.name;
+    }
     
     addItem(int qty, String item){
       if item in database and qty not null {
@@ -144,20 +152,22 @@ Methods:
     
     addCombo(int qty, String combo){
        query = query Combo model where name == combo
-       if query not null and qty not null
+       if query not null and qty not null {
           foodItems = get all food items from query
           for item in foodItems {
             // update/add key: item, value: qty  += qty_from_query * qty in order HashMap
-        }
+          }
+       }
      }
     
     removeCombo(int qty, String item){
        query = query Combo model where name == combo
-       if query not null and qty not null
+       if query not null and qty not null {
           foodItems = get all food items from query
           for item in foodItems {
             // update/add key: item, value: qty  -= qty_from_query * qty in order HashMap if qty - qty_from_query * qty >= 0 else 0
         }
+      }
     }
 
 
