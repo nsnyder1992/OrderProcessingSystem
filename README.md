@@ -172,55 +172,70 @@ Methods:
 
 
 ## Controllers
+
 This section will decribes controllers and their methods
 
 ### OrderController
-Attributes:
 
-    private static idIndexer::Integer     // this will increase each time a Order is created, reset by crontab method after midnight, this can be accessed by all class instances
-    orderQueue::LinkedList<Order>         // this will keep the orders in a FIFO 
-    inProcessList::LinkedList<Order>      // this will keep the orders that are being processed by the Chefs but might not be FIFO depending on prepare time so this is just a list
-    completedQueue::LinkedList<Order>     // this will keep the orders that are Completed waiting for the waiter to deliver
-    deliveredList::LinkedList<Order>      // this will keep the orders that are delivered until waiter sees customer leave, in case of customer rejection
-    statusMap::HashMap<Integer, Integer>  //key: orderId, value: "1" = orderQueue | "2" = inProcessList | "3" = completedQueue | "4" = deliveredList
+Attributes:
+    
+    // All the following can be accessed by all class instances, so many OrderControllers can be running at one time at scale
+    private static idIndexer::Integer       // this will increase each time a Order is created, reset by crontab method after midnight
+    private static orderQueue::LinkedList<Order>           // this will keep the orders in a FIFO 
+    private static inProcessList::LinkedList<Order>        // this will keep the orders that are being processed by the Chefs but might not be FIFO depending on prepare time so this is just a list
+    private static completedQueue::LinkedList<Order>       // this will keep the orders that are Completed waiting for the waiter to deliver
+    private static deliveredList::LinkedList<Order>        // this will keep the orders that are delivered until waiter sees customer leave, in case of customer rejection
+    private static statusMap::HashMap<Integer, Integer[2]>  //key: orderId, value: [whichQueue, indexInList]
+                                             //whichQueue = "1" = orderQueue | "2" = inProcessList | "3" = completedQueue | "4" = deliveredList
+
+**Note:** the above statusMap adds Space Complexity, but will allow for easy finding where the 
 
 Methods:
 
     createOrder() {
-        //idIndexer++
-        //return new Order(idIndexer)
+        idIndexer++;
+        return new Order(idIndexer);
      }
+     
+     getOrderStatus(Order orderId) {
+      // return value from statusMap where key == order.id
+    }
     
     sendOrder(Order order) {
       // add order to orderQueue
-      // add key: order.id, value: "1" to statusMap
+      // add key: order.id, value: [1, orderQueue.length - 1]
     }
     
     processOrder() {
-      // remove first order from orderQueue
       // add to inProcessQueue
+      // remove first order from orderQueue
+      // add key: order.id, value: [2, inProcessQueue.length - 1]
     }
     
     completeOrder(Order order) {
       // add to completedQueue
       // remove order from inProcessQueue
+      // add key: order.id, value: [3, completedQueue.length - 1]
     }
     
     deliveredOrder(Order order) {
       // add to deliverdList
       // remove order from completeQueue
+      // add key: order.id, value: [4, deliverdList.length - 1]      
     }
     
     deleteOrder(Order order) {
-      //remove order from deliverdList
+      // remove order from deliverdList
+      // remove order from status map where key == order.id
      }
      
-    updateOrder(int orderId) {
-      //traverse OrderQueue until orderId matches O
+    updateOrder(Order newOrder) {
+      // get status of order in statusMap where key == newOrder.id
+      // if status == 1 then update order = newOrder
      }
    
     resetIndexer() {
-      //idIndexer = 0
+      idIndexer = 0;
      }
 
 #### Cashier Work Flow with regard to Order Processing
