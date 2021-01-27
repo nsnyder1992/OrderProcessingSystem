@@ -40,7 +40,7 @@ This will allow a User of type "Cashier" to Create and Read an Order and submit 
 
 This will allow a User of type "Cashier" to Create and Read an Order and submit it to the OrderQueue. If the order is still in the OrderQueue, and not in the inProcessQueue or completedQueue, the Cashier will be able to Update and Delete an Order. The Cashier Workflow is the following:
 
-![Waiter Work Flow](/images/WaiterChart.png)
+![Waiter Work Flow](/images/WaiterChart1.png)
 
 1. Cashier creates a new instance of the Order class using createOrder()
 2. uses an Order.addItem() method to add an item to the Order
