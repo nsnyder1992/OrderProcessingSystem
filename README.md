@@ -1,6 +1,6 @@
 # Order Processing System
 
-The objective of this project is to decribe how to implement a Order Processing System for a Robot Cafeteria. The Cafeteria will start off with 3 workers: a cashier, a chef, and a waiter. The purpoose of this project is not to describe operation of the Robots, but how these robots will interact with the Ordering System. This project needs to be able to scale as the popularity of the Cafeteria increase.
+The objective of this project is to describe how to implement a Order Processing System for a Robot Cafeteria. The Cafeteria will start off with 3 workers: a cashier, a chef, and a waiter. The purpose of this project is not to describe operation of the Robots, but how these robots will interact with the Ordering System. This project needs to be able to scale as the popularity of the Cafeteria increase.
 
 ## Workflows
 
@@ -94,25 +94,25 @@ Attributes:
     qty::Integer
     units::String
 
-### ReciepeSteps
+### RecipeSteps
 
-This will be a One-to-many type relationship model where there will be 1 Reciepe to many steps including prepare, utilities, and ingredients
+This will be a One-to-many type relationship model where there will be 1 Recipe to many steps including prepare, utilities, and ingredients
 
 Attributes:
 
     recipeId::Integer
     stepNum::Integer          //which step we are on
     prepareId::Integer
-    utiltityId::Integer
+    utilityId::Integer
     ingredientId::Integer
     qty::Integer
     units::String
     mixWithNext::boolean      //if true mix with the next in line, can sequence this to mix as many ingredients at one time
     timeToPrepare::Integer    //seconds
-    timeToFlip::Integer       //when to interupt to flip burgers, steaks,etc
-    conccurent::boolean       //if other processes can be done conncurrently, then set to true. Like waiting on brownies in the oven
+    timeToFlip::Integer       //when to interrupt to flip burgers, steaks,etc
+    concurrent::boolean       //if other processes can be done concurrently, then set to true. Like waiting on brownies in the oven
 
-Might need to add more things above to account for more actions, but the general idea is to save the ReciepeSteps in the database to help calculate optimum amount of time and space within the Cafeteria Kitchen.
+Might need to add more things above to account for more actions, but the general idea is to save the RecipeSteps in the database to help calculate optimum amount of time and space within the Cafeteria Kitchen.
 
 ### User
 
@@ -148,7 +148,7 @@ Attributes:
 
     id::Integer
     name::String            //"Hamburger", "Chicken Sandwich", etc
-    reciepeId::Integer      //from Reciepe Model
+    recipeId::Integer      //from Recipe Model
     menuTypeId::Integer     //from MenuType Model
 
 ### Combos
@@ -160,7 +160,7 @@ Attributes:
 
 ### ComboFoods
 
-One to Many Relationship between Combos and its assoiciated FoodItems
+One to Many Relationship between Combos and its associated FoodItems
 
 Attributes:
 
@@ -169,13 +169,13 @@ Attributes:
 
 ### Order
 
-This model will not be held in the database but will be a model the program can use to store relavent data about the order
+This model will not be held in the database but will be a model the program can use to store relevant data about the order
 
 Attributes:
 
     private id::Integer
     name::String                          //name on order
-    order::HashMap<FoodItem, Interger>    //<key: FoodItem, value: quantity>
+    order::HashMap<FoodItem, Integer>    //<key: FoodItem, value: quantity>
 
 Methods:
 
@@ -185,7 +185,7 @@ Methods:
 
 ## Controllers
 
-This section will decribes controllers and their methods
+This section will describes controllers and their methods
 
 ### OrderController
 
@@ -273,14 +273,14 @@ Methods:
     }
 
     deliveredOrder() {
-      // add to deliverdList
+      // add to deliveredList
       // remove order from completeQueue
-      // add key: order.id, value: [4, deliverdList.length - 1]
+      // add key: order.id, value: [4, deliveredList.length - 1]
       // return order
     }
 
     deleteOrder(Order order) {
-      // remove order from deliverdList
+      // remove order from deliveredList
       // remove order from status map where key == order.id
      }
 
@@ -293,21 +293,12 @@ Methods:
       idIndexer = 0;
      }
 
-### MenuController
+### ModelControllers
 
-This will allow a User of type "Cashier" to Create and Read an Order and submit it to the OrderQueue. If the order is still in the OrderQueue, and not in the inProcessQueue or completedQueue, the Cashier will be able to Update and Delete an Order.
-
-### OrderQueue
-
-That will allow the cashier to add Orders given an orderId and the order. The orderId's will be stored in a queue based on a optimazation Algorthim. The next Order in the queue will be processed by the next availble Robot Chef.
-
-### ReciepeController
-
-Attributes:
-
-- ingredients::HashMap<Integer, Integer> //key: ingredientId, value: quantity needed for Reciepe
-- steps::ArrayList<ArrayList<Integer>> //ie {{prepareId, utilityId, itemId, itemQty, timeToPrepare, flipTime, flipCount}}
+All Models in the model section would have their corresponding
 
 ### Middleware
 
-SecurityLevels will allow Cashiers to only add/updadte/remove orders to and from the queue, Chefs to start/prepare/complete orders, and waiters to take orders from a completed orders queue. Admins would be allowed to change
+#### Authorization
+
+This part of the program would check the SecurityLevels of each user and only allow them to do certain operations. For example a Cashiers would only be allowed to create/read/update/delete orders that are in the orderQueue. Chefs would be the only ones allowed to move orders from the order queue to the inProcessQueue and then later to the Completed Queue.
