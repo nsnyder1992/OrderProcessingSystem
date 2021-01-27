@@ -2,6 +2,49 @@
 
 The objective of this project is to decribe how to implement a Order Processing System for a Robot Cafeteria. The Cafeteria will start off with 3 workers: a cashier, a chef, and a waiter. The purpoose of this project is not to describe operation of the Robots, but how these robots will interact with the Ordering System. This project needs to be able to scale as the popularity of the Cafeteria increase.
 
+
+## Workflows
+
+This section will describe how each robot will interact with the processing system
+
+#### Cashier Work Flow with regard to Order Processing
+This will allow a User of type "Cashier" to Create and Read an Order and submit it to the OrderQueue. If the order is still in the OrderQueue, and not in the inProcessQueue or completedQueue, the Cashier will be able to Update and Delete an Order. The Cashier Workflow is the following:
+
+
+
+1. Cashier creates a new instance of the Order class using createOrder()
+2. uses an Order.addItem() method to add an item to the Order
+3. uses a Order.removeItem() method to remove an item, if total quantity not < 0
+4. uses an Order.addCombo() method to add items within a combo
+5. uses a Order.removeCombo() method to remove an item, if total quantity not < 0
+6. when customer is satisfied the Cashier can send order to order queue
+7. If customer decided to change the order and it is still within the orderQueue then the Cashier can update
+8. If customer decided to delete the order and it is still within the orderQueue then the Cashier can update
+
+#### Chef Work Flow with regard to Order Processing
+This will allow a User of type "Cashier" to Create and Read an Order and submit it to the OrderQueue. If the order is still in the OrderQueue, and not in the inProcessQueue or completedQueue, the Cashier will be able to Update and Delete an Order. The Cashier Workflow is the following:
+
+1) Cashier creates a new instance of the Order class using createOrder()
+2) uses an Order.addItem() method to add an item to the Order
+3) uses a Order.removeItem() method to remove an item, if total quantity not < 0
+4) uses an Order.addCombo() method to add items within a combo
+5) uses a Order.removeCombo() method to remove an item, if total quantity not < 0
+6) when customer is satisfied the Cashier can send order to order queue
+7) If customer decided to change the order and it is still within the orderQueue then the Cashier can update
+8) If customer decided to delete the order and it is still within the orderQueue then the Cashier can update
+
+#### Cashier Work Flow with regard to Order Processing
+This will allow a User of type "Cashier" to Create and Read an Order and submit it to the OrderQueue. If the order is still in the OrderQueue, and not in the inProcessQueue or completedQueue, the Cashier will be able to Update and Delete an Order. The Cashier Workflow is the following:
+
+1) Cashier creates a new instance of the Order class using createOrder()
+2) uses an Order.addItem() method to add an item to the Order
+3) uses a Order.removeItem() method to remove an item, if total quantity not < 0
+4) uses an Order.addCombo() method to add items within a combo
+5) uses a Order.removeCombo() method to remove an item, if total quantity not < 0
+6) when customer is satisfied the Cashier can send order to order queue
+7) If customer decided to change the order and it is still within the orderQueue then the Cashier can update
+8) If customer decided to delete the order and it is still within the orderQueue then the Cashier can update
+
 ## Models:
 
 In this section each model needed for this system will be described. These Models will be stored in a database and then accessed and manipulate via a controller. 
@@ -112,11 +155,9 @@ Attributes:
     comboId::Integer
     foodItemId::Integer
   
-## Temporay Class Models
-
-This section will decribes classes that will be temporary used with in the application to store information until it is no longer needed
-
 ### Order
+
+This model will not be held in the database but will be a model the program can use to store relavent data about the order
 
 Attributes:
 
@@ -128,46 +169,6 @@ Methods:
 
     Constructor(id) {
         this.id = id;
-    }
-
-    setName(String name) {
-        this.name = name;
-    }
-    
-    getName(String name) {
-       return this.name;
-    }
-    
-    addItem(int qty, String item){
-      if item in database and qty not null {
-        // update/add key: item, value: qty  += qty in order HashMap
-      }
-    }
-
-    removeItem(int qty, String item){
-        if item in database and qty not null {
-          // update/add key: item, value: qty -= qty in order HashMap if qty - qty >= 0 else 0
-        }
-    }
-    
-    addCombo(int qty, String combo){
-       query = query Combo model where name == combo
-       if query not null and qty not null {
-          foodItems = get all food items from query
-          for item in foodItems {
-            // update/add key: item, value: qty  += qty_from_query * qty in order HashMap
-          }
-       }
-     }
-    
-    removeCombo(int qty, String item){
-       query = query Combo model where name == combo
-       if query not null and qty not null {
-          foodItems = get all food items from query
-          for item in foodItems {
-            // update/add key: item, value: qty  -= qty_from_query * qty in order HashMap if qty - qty_from_query * qty >= 0 else 0
-        }
-      }
     }
 
 
@@ -188,7 +189,8 @@ Attributes:
     private static statusMap::HashMap<Integer, Integer[2]>  //key: orderId, value: [whichQueue, indexInList]
                                              //whichQueue = "1" = orderQueue | "2" = inProcessList | "3" = completedQueue | "4" = deliveredList
 
-**Note:** the above statusMap adds Space Complexity, but will allow for easy finding where the 
+**Note:** The above instance variable statusMap adds Space Complexity, but will allow for easy finding where a given order is in the process
+**Note:** Also the above instance variables of type LinkedList and HashMap are not thread-safe, so if a thread is needed, will need to find away to make them synchronous. HashTable could be used for HashMap. But, LinkedList has the options need for this application, so maybe using Collections.synchronizedList() will do the trick.
 
 Methods:
 
@@ -197,6 +199,46 @@ Methods:
         return new Order(idIndexer);
      }
      
+    setName(Order order, String name) {
+        this.name = name;
+    }
+    
+    getName(Order order, String name) {
+       return this.name;
+    }
+    
+    addItem(Order order, int qty, String item){
+      if item in database and qty not null {
+        // update/add key: item, value: qty  += qty in order HashMap
+      }
+    }
+
+    removeItem(Order order, int qty, String item){
+        if item in database and qty not null {
+          // update/add key: item, value: qty -= qty in order HashMap if qty - qty >= 0 else 0
+        }
+    }
+    
+    addCombo(Order order, int qty, String combo){
+       query = query Combo model where name == combo
+       if query not null and qty not null {
+          foodItems = get all food items from query
+          for item in foodItems {
+            // update/add key: item, value: qty  += qty_from_query * qty in order HashMap
+          }
+       }
+     }
+    
+    removeCombo(Order order, int qty, String item){
+       query = query Combo model where name == combo
+       if query not null and qty not null {
+          foodItems = get all food items from query
+          for item in foodItems {
+            // update/add key: item, value: qty  -= qty_from_query * qty in order HashMap if qty - qty_from_query * qty >= 0 else 0
+        }
+      }
+    }
+    
      getOrderStatus(Order orderId) {
       // return value from statusMap where key == order.id
     }
@@ -210,6 +252,7 @@ Methods:
       // add to inProcessQueue
       // remove first order from orderQueue
       // add key: order.id, value: [2, inProcessQueue.length - 1]
+      // return order
     }
     
     completeOrder(Order order) {
@@ -218,10 +261,11 @@ Methods:
       // add key: order.id, value: [3, completedQueue.length - 1]
     }
     
-    deliveredOrder(Order order) {
+    deliveredOrder() {
       // add to deliverdList
       // remove order from completeQueue
-      // add key: order.id, value: [4, deliverdList.length - 1]      
+      // add key: order.id, value: [4, deliverdList.length - 1]
+      // return order
     }
     
     deleteOrder(Order order) {
@@ -237,42 +281,6 @@ Methods:
     resetIndexer() {
       idIndexer = 0;
      }
-
-#### Cashier Work Flow with regard to Order Processing
-This will allow a User of type "Cashier" to Create and Read an Order and submit it to the OrderQueue. If the order is still in the OrderQueue, and not in the inProcessQueue or completedQueue, the Cashier will be able to Update and Delete an Order. The Cashier Workflow is the following:
-
-1. Cashier creates a new instance of the Order class using createOrder()
-2. uses an Order.addItem() method to add an item to the Order
-3. uses a Order.removeItem() method to remove an item, if total quantity not < 0
-4. uses an Order.addCombo() method to add items within a combo
-5. uses a Order.removeCombo() method to remove an item, if total quantity not < 0
-6. when customer is satisfied the Cashier can send order to order queue
-7. If customer decided to change the order and it is still within the orderQueue then the Cashier can update
-8. If customer decided to delete the order and it is still within the orderQueue then the Cashier can update
-
-#### Chef Work Flow with regard to Order Processing
-This will allow a User of type "Cashier" to Create and Read an Order and submit it to the OrderQueue. If the order is still in the OrderQueue, and not in the inProcessQueue or completedQueue, the Cashier will be able to Update and Delete an Order. The Cashier Workflow is the following:
-
-1) Cashier creates a new instance of the Order class using createOrder()
-2) uses an Order.addItem() method to add an item to the Order
-3) uses a Order.removeItem() method to remove an item, if total quantity not < 0
-4) uses an Order.addCombo() method to add items within a combo
-5) uses a Order.removeCombo() method to remove an item, if total quantity not < 0
-6) when customer is satisfied the Cashier can send order to order queue
-7) If customer decided to change the order and it is still within the orderQueue then the Cashier can update
-8) If customer decided to delete the order and it is still within the orderQueue then the Cashier can update
-
-#### Cashier Work Flow with regard to Order Processing
-This will allow a User of type "Cashier" to Create and Read an Order and submit it to the OrderQueue. If the order is still in the OrderQueue, and not in the inProcessQueue or completedQueue, the Cashier will be able to Update and Delete an Order. The Cashier Workflow is the following:
-
-1) Cashier creates a new instance of the Order class using createOrder()
-2) uses an Order.addItem() method to add an item to the Order
-3) uses a Order.removeItem() method to remove an item, if total quantity not < 0
-4) uses an Order.addCombo() method to add items within a combo
-5) uses a Order.removeCombo() method to remove an item, if total quantity not < 0
-6) when customer is satisfied the Cashier can send order to order queue
-7) If customer decided to change the order and it is still within the orderQueue then the Cashier can update
-8) If customer decided to delete the order and it is still within the orderQueue then the Cashier can update
 
 ### MenuController
 This will allow a User of type "Cashier" to Create and Read an Order and submit it to the OrderQueue. If the order is still in the OrderQueue, and not in the inProcessQueue or completedQueue, the Cashier will be able to Update and Delete an Order. 
