@@ -18,8 +18,8 @@ This will allow a User of type "Cashier" to Create and Read an Order and submit 
 4. uses an addCombo(orderId) method to add items within a combo
 5. uses a removeCombo(orderId) method to remove an item, if total quantity not < 0
 6. when customer is satisfied the Cashier can send order to order queue
-7. If customer decided to change the order and it is still within the orderQueue then the Cashier can update
-8. If customer decided to delete the order and it is still within the orderQueue then the Cashier can update
+7. If customer decides to change the order and it is still within the orderQueue then the Cashier can update
+8. If customer decides to delete the order and it is still within the orderQueue then the Cashier can delete
 
 #### Chef Work Flow with regard to Order Processing
 
@@ -27,24 +27,23 @@ User of type "Chef" will be able to move order from orderQueue to inProcessList 
 
 ![Chef Work Flow](/images/ChefChart.png)
 
-1. The Chef will take the next order at the head of the Queue and place it into the inProcessList
-2. Then the Chef prepare order according to RecipeSteps and set the start time of the order
-3. Once Recipe is done the Chef will remove that order from the
+1. If an order is present in the orderQueue, the Chef will take the order at the head of the Queue and place it into the inProcessList
+2. The order start time is set
+3. Then the Chef prepares order according to RecipeSteps for each item in order
+4. Once Recipes for each item on the order is done, then the Chef can remove order from the inProcessList and move to completedQueue
+5. The Chef will then take the next order from the head of the Queue and start the process again
 
 #### Waiter Work Flow with regard to Order Processing
 
-This will allow a User of type "Cashier" to Create and Read an Order and submit it to the OrderQueue. If the order is still in the OrderQueue, and not in the inProcessQueue or completedQueue, the Cashier will be able to Update and Delete an Order. The Cashier Workflow is the following:
+A "Waiter" User will be able to move a order from the completedQueue to the deliveredList and if the customer is satisfied delete the order from the list. If the customer is dissatisfied the "Waiter" will put a new order with items with quality issue back to the front of the orderQueue. The Waiter Workflow is the following:
 
 ![Waiter Work Flow](/images/WaiterChart1.png)
 
-1. Cashier creates a new instance of the Order class using createOrder()
-2. uses an Order.addItem() method to add an item to the Order
-3. uses a Order.removeItem() method to remove an item, if total quantity not < 0
-4. uses an Order.addCombo() method to add items within a combo
-5. uses a Order.removeCombo() method to remove an item, if total quantity not < 0
-6. when customer is satisfied the Cashier can send order to order queue
-7. If customer decided to change the order and it is still within the orderQueue then the Cashier can update
-8. If customer decided to delete the order and it is still within the orderQueue then the Cashier can update
+1. The Waiter waits for an order to appear in the orderQueue.
+2. Once there, the waiter will take the first order in the Queue and deliver it to the customer, and place the order in the deliveredList
+3. After some amount of time, the waiter will need to check with the customer and see if everything is ok
+4. If ok, the Waiter can delete the order from the deliveredList
+5. If not ok, the Waiter will need to make a new order made up of the items with quality issues and place it at the beginning of the orderQueue
 
 ## Controllers
 
@@ -63,8 +62,9 @@ Attributes:
     private static statusMap::HashMap<Integer, Integer[2]>  //key: orderId, value: [whichQueue, indexInList]
                                              //whichQueue = "1" = orderQueue | "2" = inProcessList | "3" = completedQueue | "4" = deliveredList
 
-**Note:** The above instance variable statusMap adds Space Complexity, but will allow for easy finding where a given order is in the process
-**Note:** Also the above instance variables of type LinkedList, ArrayList and HashMap are not thread-safe, so if a thread is needed, will need to find away to make them synchronous. HashTable could be used for HashMap. But, LinkedList and ArrayList has the options needed for this application, so maybe using Collections.synchronizedList() will do the trick.
+**Note:** The above instance variable add Space Complexity, but will allow to easily and quickly find where a given order is in the process
+
+**Note:** Also the above instance variables of type LinkedList, ArrayList and HashMap are _not_ thread-safe, so if a thread is needed, we will need to find away to make them synchronous. HashTable could be used for HashMap. But, LinkedList and ArrayList have nice built-in methods for this application, so maybe using Collections.synchronizedList() will do the trick.
 
 Methods:
 
