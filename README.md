@@ -15,6 +15,7 @@ Also note that this project will eventually be created in Java, so some referenc
 - Models
 - Controllers
 - Middleware
+- Maintenance
 
 ## Workflows
 
@@ -90,7 +91,7 @@ To be sure there are more bottlenecks to be found, especially when the code is a
 
 ## Models:
 
-In this section the most important models needed for this project will be described, though more tables will be needed to fulfill the full application. These models are how the application will access data from a database.
+In this section the most important models needed for this project will be described, though more tables will be needed to fulfill the full application. These models are how the application will store data temporarily, where each attribute represents a column in the database
 
 ### Order (Database)
 
@@ -235,18 +236,6 @@ In the below methods not all error/logic checks are shown as this is just an ove
           // set the name on the order
         }
 
-        setCashierId(int orderId) {
-          // order.cashierId = user.id
-        }
-
-        setChefId(int orderId) {
-          // order.chefId = user.id
-        }
-
-        setWaiterId(int orderId) {
-          // order.waiterId = user.id
-        }
-
         /********************************************************************
           Getters and setters for all other simple attributes would go here
         ********************************************************************/
@@ -273,54 +262,9 @@ In the below methods not all error/logic checks are shown as this is just an ove
           }
         }
 
-        addCombo(int orderId, int qty, int comboId){
-          if order in orderQueue {
-            foodItems = get all foodItems from FoodItems model where comboId == comboId
-            for item in foodItems {
-              // update/add qty of item on the order
-              addPrepTime(orderId, itemId)
-            }
-          }
-        }
-
-        removeCombo(int orderId, int qty, int comboId){
-          if order in orderQueue {
-            foodItems = get all foodItems from FoodItems model where comboId == comboId
-            for item in foodItems {
-              // update qty of item on the order
-              removePrepTime(orderId, itemId)
-            }
-          }
-        }
-
-        getOrderItems(int orderId) {
-          // all items from orderItems where orderId == orderId
-        }
-
-        getOrderStatus(int orderId) {
-          // get status from statusMap where key == orderId
-        }
-
-        getEstTime(int orderId, int[3] status) {
-          //This is the naive approach. A more accurate prepTime can be achieve here because it depends on the number of robot chefs, but this shows the basic approach
-
-          if status[0] > 2 return 0 //no time left "complete"
-
-          if status[0] == 1 {
-            // queueTime = traverse orderQueue summing orders.totalPrepTime until orderQueue[index] == orderId + totalPrepTime of that order
-            // minProcessTime = getMinProcessTime()
-            // return queueTime + minProcessTime
-          }
-
-          if status[0] == 2 {
-            // return sum of item.prepTime for all items *not* complete in the orderItems table
-          }
-
-        }
-
-        getMinProcessTime() {
-          // find order with min time left and return the time
-        }
+        /********************************************************************
+          Add additional features here like get estimate time to complete
+        ********************************************************************/
 
         processOrder() {
           // remove first order from orderQueue
@@ -368,3 +312,23 @@ This piece of the application will mainly handle operations that need to be proc
 #### Authorization
 
 This part of the program would check the SecurityLevels of each user and only allow them to do certain operations. For example a Cashier would only be allowed to create/read/update/delete orders that are in the orderQueue. Chefs would be the only ones allowed to move orders from the orderQueue to the inProcessList and then later to the completedQueue, etc.
+
+## Maintenance
+
+The TODO list below should be used to keep track of WIP, as the dev group grows we will revisit the WIP for this project.
+
+    TODO:                       Folder                                          Line
+
+    -Create OrderController     /OrderProcessingSystem/src/main                 0
+
+For non working code, when possible, place at the bottom of the code block and comment it out wrapped like the following:
+
+    /***********************************************************
+                    WORK IN PROGRESS
+    ************************************************************/
+
+    // commented code goes here
+
+    /***********************************************************
+                    WORK IN PROGRESS
+    ************************************************************/
