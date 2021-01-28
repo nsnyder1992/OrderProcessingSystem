@@ -70,7 +70,7 @@ In this section, some potential bottlenecks of the aforementioned workflows are 
     completedQueue = [4, 3, 7]    //Java LinkedList of order ids
     deliveredList = [2 , 1, 5]    //Java ArrayList  of order ids
 
-Explanation: In above example orders 0 and 1 have already been delivered but order 0 was rejected so a new order, order 13, was placed at the beginning of orderQueue by the waiter. Orders 6, 8, and 9 are being processed. Order 7 was faster to make than 6 so it was placed in the completedQueue. In completedQueue, you can see that 4 was faster than 3 as it is in front of it in the Queue. In delivered list, this also goes for 2 and 1. And, 5 was faster than 4. Also note, even though inProcessList is sorted at the moment, after processing orders 13 and 10, that will no longer be true. See update list below. This example shows some of the common problems with this paradigm, causing more complexity to find and place orders.
+Explanation: In above example, orders 0 and 1 have already been delivered but order 0 was rejected so a new order, order 13, was placed at the beginning of orderQueue by the waiter. Orders 6, 8, and 9 are being processed. Order 7 was faster to prepare than 6, so it was placed in the completedQueue first. In completedQueue, you can see that 4 was faster than 3. In deliveredList, this also goes for 2 and 1. And, 5 was faster than 4. Also note, even though inProcessList is sorted at the moment, after processing orders 13 and 10, that will no longer be true. See update list below. This example shows some of the common problems with this paradigm, causing more complexity to find and place orders.
 
     inProcessList = [6, 8, 9, 13, 9]     //Java ArrayList  of order ids
 
