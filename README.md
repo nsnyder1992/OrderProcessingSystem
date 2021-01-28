@@ -200,7 +200,7 @@ This section will describes controllers and their methods
         private static inProcessList::ArrayList<Integer>          // this will keep the orders that are being processed by the Chefs but might not be FIFO depending on prepare time so this is just a list
         private static completedQueue::LinkedList<Integer>        // this will keep the orders that are Completed waiting for the waiter to deliver
         private static deliveredList::ArrayList<Integer>          // this will keep the orders that are delivered until waiter sees customer leave, in case of customer rejection
-        private static statusMap::HashMap<Integer>                // key: orderId, value: queue
+        private static statusMap::HashMap<Integer>                // key: orderId, value: queueNum
                                                                   // queueNum => "1" = orderQueue | "2" = inProcessList | "3" = completedQueue | "4" = deliveredList
 
 **Note:** The above instance variables add Space Complexity, but the idea is to be able to easily and quickly find where a given order is in the process
