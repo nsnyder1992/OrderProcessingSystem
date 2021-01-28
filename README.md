@@ -359,7 +359,7 @@ In the below methods not all error/logic checks are shown as this is just an ove
 
 ### Other Model Controllers
 
-All Models in the model section above would have a corresponding controller allowing for manipulating, retrieving and processing of data within the database. Since this exercise is more focused on how to process and track orders, I have decide to neglect showing any pseudo-code for them.
+All Models in the model section above would have a corresponding controller allowing for manipulating, retrieving and processing of data within the database. Since this exercise is more focused on how to process and track orders, I have decided to neglect showing any pseudo-code for them.
 
 ### Middleware
 
