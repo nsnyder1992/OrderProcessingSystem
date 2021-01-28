@@ -80,15 +80,17 @@ Why use a array for orders being processed or delivered? Unlike the queues descr
 
 Using this {orderId: [queueNum, index]} data structure allows us to cut out finding where a order is in a array fast, but anytime we update the queue or list we will need to update the index parameter, having O(N) time complexity, which is our next bottleneck. Plus, the index doesn't really have any effect on the queue since we have to traverse the queue anyway, so in the pseudo-code below it was decided to not update the index for orders in queues.
 
-To fix this bottleneck, a binary search algorithm could be used to find the orderId in the inProcessList and the deliveredList. This would get rid of the need for the index in the statusMap leaving {orderId: queueNum}, and would only have a O(log(N)) time complexity.
+To fix this bottleneck, a binary search algorithm could be used to find the orderId in the inProcessList and the deliveredList. This would get rid of the need for the index in the statusMap leaving {orderId: queueNum}, and would only have a O(log(N)) time complexity. This means we will need to sort the ArrayLists as we insert new elements but this is much easier to do as the program will insert one at a time.
 
     statusMap = { 1: 4, 2: 4, 3: 3, 4: 3, 5: 4, 6: 2, 7: 3, 8: 2, 9: 2, 10: 1, 11: 1, 12: 1, 13: 1} // much easier to look at!
 
-To be sure there are more bottlenecks to be found, especially when the code is actually being implemented, but hopefully this demonstrates what I would do to solve certain bottlenecks in real world problems!
+The Next bottleneck is when deleting an order from the orderQueue, as said a queue needs to traverse the entire length until the order is found, then remove it. There maybe a solution to this one, but it was decided to not dive to deeply into this one as submission date was approaching. But one thought would be to start a thread to delete the order as to not hold up the project, but LinkedList, ArrayList, and HashMap are _not_ thread safe. So, maybe using HashTable instead of HashMap and Collections.synchronizedList() to synchronize the List objects.
+
+To be sure there are more bottlenecks to be found, especially when the code is actually being implemented and unit tested, but hopefully this demonstrates what I would do to solve certain bottlenecks in real world problems!
 
 ## Models:
 
-In this section each model needed for this system will be described. These models are how the application will access data, either from a database or data stored temporarily for the application. They will be denoted as such in their title
+In this section the most important models needed for this project will be described, though more tables will be needed to fulfill the full application. These models are how the application will access data from a database.
 
 ### Order (Database)
 
@@ -115,7 +117,7 @@ This table is a one-to-many relationship between an order and it's items
     Attributes:
 
         orderId::Integer                      // orderId
-        itemId::Integer                       // name on order
+        foodItemId::Integer                   // from foodItems table
         isComplete::boolean                   // true if complete
 
 ### FoodItem (Database)
@@ -123,9 +125,9 @@ This table is a one-to-many relationship between an order and it's items
     Attributes:
 
         id::Integer
-        name::String            //"Hamburger", "Chicken Sandwich", etc
+        name::String            //"Hamburger", "Chicken Sandwich", "Fries" etc
         prepTime::Integer       //sum of all the non-concurrent steps or the max concurrent step depending on which is longer in the recipe
-        menuTypeId::Integer     //from MenuType Model
+        menuTypeId::Integer     //from MenuType Model ("Dinner", "Dessert", "Sides", etc)
 
 ### Combos (Database)
 
@@ -143,13 +145,6 @@ One to Many Relationship between Combos and its associated FoodItems
         comboId::Integer
         foodItemId::Integer
 
-### MenuType (Database)
-
-    Attributes:
-
-        id::Integer
-        name::String //"Dinner", "Dessert", "Sides", etc
-
 ### RecipeSteps (Database)
 
 This will be a One-to-many type relationship model where there will be 1 foodItemId to many steps including prepare, utilities, and ingredients
@@ -158,9 +153,9 @@ This will be a One-to-many type relationship model where there will be 1 foodIte
 
         foodItemId::Integer           //from FoodItem model
         stepNum::Integer              //which step we are on
-        prepareId::Integer            //from Prepare model
-        utilityId::Integer            //from Utility model
-        ingredientId::Integer         // from Ingredients model
+        prepareId::Integer            //from Prepare model (ie "Cook", "Chop", etc)
+        utilityId::Integer            //from Utility model (ie "Oven", "Knife", etc)
+        ingredientId::Integer         // from Ingredients model (ie "salt", "hamburger patty", etc)
         qty::Integer
         units::String
         mixWithNext::boolean          //if true mix with the next in line, can sequence this to mix as many ingredients at one time
@@ -169,45 +164,6 @@ This will be a One-to-many type relationship model where there will be 1 foodIte
         concurrent::boolean           //if other processes can be done concurrently, then set to true. Like waiting on brownies in the oven
 
 Might need to add more things above to account for more actions, but the general idea is to save the RecipeSteps in the database to help calculate optimum amount of time and space within the Cafeteria Kitchen.
-
-### RecipeIngredients (Database)
-
-This is a One-to-many type relationship model where there will be 1 Recipe to many ingredients
-
-    Attributes:
-
-        foodItemId::Integer       // from FoodItem model
-        ingredientId::Integer     // from Ingredients model
-        qty::Integer
-        units::String
-
-### Ingredients (Database)
-
-These will be the lowest level of the classes that make up FoodItems
-
-    Attributes:
-
-        id::Integer
-        name::String
-        inventoryQty::Integer
-
-### Prepare (Database)
-
-These prepare models describe what to do to ingredients to make a FoodItem. For example "Cook", "Chop", etc.
-
-    Attributes:
-
-        id::Integer
-        name::String
-
-### Utility (Database)
-
-The Utility model will specify what should be used to Prepare the ingredients, ie "Oven", "Knife", etc
-
-    Attributes:
-
-        id::Integer
-        name::String
 
 ### User (Database)
 
