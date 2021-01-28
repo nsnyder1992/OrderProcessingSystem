@@ -65,22 +65,31 @@ A "Waiter" User will be able to move a order from the completedQueue to the deli
 
 In this section, some potential bottlenecks of the aforementioned workflows are found and solutions are presented. Below is an example of how the queue's and lists are going to store orders:
 
-    orderQueue = [10, 11, 12, 13] //Java LinkedList of order ids
+    orderQueue = [13, 10, 11, 12] //Java LinkedList of order ids
     inProcessList = [6, 8, 9]     //Java ArrayList  of order ids
     completedQueue = [4, 3, 7]    //Java LinkedList of order ids
     deliveredList = [2 , 1, 5]    //Java ArrayList  of order ids
+
+Explanation: In above example, orders 0 and 1 have already been delivered but order 0 was rejected so a new order, order 13, was placed at the beginning of orderQueue by the waiter. Orders 6, 8, and 9 are being processed. Order 7 was faster to prepare than 6, so it was placed in the completedQueue first. In completedQueue, you can see that 4 was faster than 3. In deliveredList, this also goes for 2 and 1. And, 5 was faster than 4. Also note, even though inProcessList is sorted at the moment, after processing orders 13 and 10, that will no longer be true. See update list below. This example shows some of the common problems with this paradigm, causing more complexity to find and place orders.
+
+    inProcessList = [6, 8, 9, 13, 9]     //Java ArrayList  of order ids
 
 Why use a queue for orders placed and completed? Well a queue is best when you want to process/cook the first order before the second, third or last (First In First Out or FIFO). Same for the completed orders, orders completed first need to be delivered first so they don't get cold. In the pseudo-code below, queues are implemented with the intent to use the Java LinkedLink class, that have the properties of a doubly linked list, a queue, and a dequeue, making it more powerful than a regular queue data structure.
 
 One potential bottleneck is finding where an order is, that is which queue or list it is in. The Naive approach would be to loop through each trying to find the order, but this doesn't scale very well. One solution would be to add a Hash table, statusMap, with keys being the id of the order, and the value being an array of integers. The value being defined as [queueNum, index], where queueNum identifies what queue or list the order is in (ie "1" = orderQueue, "2" = inProcessList, "3" = completedQueue, "4" = deliveredList) and index being where in the queue or list the order is. So for the example above the statusMap would be:
 
-    statusMap = { 1: [4, 1], 2: [4, 0], 3: [3, 1], 4: [3, 0], 5: [4, 2], 6: [2, 0], 7: [3, 2], 8: [2, 1], 9: [2, 2], 10: [1, 0], 11: [1, 1], 12: [1, 2], 13: [1, 3]}
+    statusMap = { 1: [4, 1], 2: [4, 0], 3: [3, 1], 4: [3, 0], 5: [4, 2], 6: [2, 0], 7: [3, 2], 8: [2, 1], 9: [2, 2], 10: [1, 0], 11: [1, 1], 12: [1, 2], 13: [1, 0]}
 
 Why use an array for orders being processed or delivered? Unlike the queues described above, these orders maybe needed to be removed out of order of when they were put in. For example, say the total prep time for order 6 is 10min and the total prep time of order 7 is 2min. The order 7 will be done before order 6 and will need to be moved to the completedQueue. And while queues are great for FIFO, they aren't great if we need to access a value, especially if we already know the index. This is due to the fact that queues are usually built on top of the linked list paradigm, where to get to a certain value it must traverse the list til that value is found.
 
 Using this {orderId: [queueNum, index]} data structure allows us to cut out finding where a order is in an array fast, but anytime we update the queue or list we will need to update the index parameter, having O(N) time complexity, which is our next bottleneck. Plus, the index doesn't really have any effect on the queue since we have to traverse the queue anyway.
 
 To fix this bottleneck, a binary search algorithm could be used to find the orderId in the inProcessList and the deliveredList. This would get rid of the need for the index in the statusMap leaving {orderId: queueNum}, and would only have a O(log(N)) time complexity. This means we will need to sort the ArrayLists as we insert new elements. With a merge sort principled insert we would have O(N log(N)) time complexity for the sorting function.
+
+    orderQueue = [13, 10, 11, 12]
+    inProcessList = [6, 8, 9]     //This one just happened to be already sorted
+    completedQueue = [4, 3, 7]
+    deliveredList = [1 , 2, 5]    //This one got sorted
 
     statusMap = { 1: 4, 2: 4, 3: 3, 4: 3, 5: 4, 6: 2, 7: 3, 8: 2, 9: 2, 10: 1, 11: 1, 12: 1, 13: 1} // much easier to look at!
 
