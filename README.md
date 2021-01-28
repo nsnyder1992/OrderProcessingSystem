@@ -200,9 +200,8 @@ This section will describes controllers and their methods
         private static inProcessList::ArrayList<Integer>          // this will keep the orders that are being processed by the Chefs but might not be FIFO depending on prepare time so this is just a list
         private static completedQueue::LinkedList<Integer>        // this will keep the orders that are Completed waiting for the waiter to deliver
         private static deliveredList::ArrayList<Integer>          // this will keep the orders that are delivered until waiter sees customer leave, in case of customer rejection
-        private static statusMap::HashMap<Integer, Integer[2]>    // key: orderId, value: [queueNum, indexInList]
+        private static statusMap::HashMap<Integer>                // key: orderId, value: queue
                                                                   // queueNum => "1" = orderQueue | "2" = inProcessList | "3" = completedQueue | "4" = deliveredList
-                                                                  // indexInList is the index of order in the queue or list
 
 **Note:** The above instance variables add Space Complexity, but the idea is to be able to easily and quickly find where a given order is in the process
 
@@ -219,9 +218,7 @@ In the below methods not all error/logic checks are shown as this is just an ove
           // index = orderQueue.length if backOfQueue else 0
           // add order.id to orderQueue[index]
 
-          // update statusMap with new orderId and [1, index]
-          // index in the case above is arbitrary as the LinkedList will have to iterate through the entire list until node is found anyway
-          // so no need to update indices for statusMap orders in either the orderQueue or the completedQueue
+          // add key: orderId, value: 1 to  statusMap
 
           // return order.id
         }
@@ -250,9 +247,9 @@ In the below methods not all error/logic checks are shown as this is just an ove
           // order.waiterId = user.id
         }
 
-        /*****************************************************************
-          Getters and setters for all other simple columns would go here
-        *****************************************************************/
+        /********************************************************************
+          Getters and setters for all other simple attributes would go here
+        ********************************************************************/
 
         addPrepTime(int orderId, int itemId) {
           // order.totalPrepTime += item.prepTime
@@ -328,8 +325,8 @@ In the below methods not all error/logic checks are shown as this is just an ove
         processOrder() {
           // remove first order from orderQueue
           // update order.chefId = user.id
-          // add to end of inProcessList
-          // update statusMap key: order.id, value: [2, inProcessList.length - 1]
+          // add order.id to inProcessList using merge sort principles
+          // update statusMap key: order.id, value: 2
         }
 
         itemComplete(int orderId, int itemId) {
@@ -337,18 +334,15 @@ In the below methods not all error/logic checks are shown as this is just an ove
         }
 
         completeOrder(int orderId) {
+          // find orderId in inProcessList using binary tree algorithm and remove
           // add to end of completedQueue
-          // remove order from inProcessList
-          // index = current index in statusMap
-          // update inProcessList orders indices in statusMap after removing order
-          // update key: order.id, value: [3, index] remember indexing a LinkedList does not speed up find time so index is arbitrary
+          // update key: order.id, value: 3
         }
 
         deliveredOrder() {
-          // add to end of deliveredList
-          // remove order from completeQueue
-          // add key: order.id, value: [4, deliveredList.length - 1]
-          // return order
+          // remove order first order from completedQueue
+          // add order.id to deliveredList using merge sort principles
+          // add key: order.id, value: 4
         }
 
         rejectOrder(int orderId) {
