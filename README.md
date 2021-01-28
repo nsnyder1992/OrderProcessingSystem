@@ -76,13 +76,13 @@ Some potential bottlenecks are finding where an order is within which queue or l
 
 Why use a array for orders being processed or delivered? Unlike the queues described above, these orders maybe needed to be removed out of order of when they were put in. For example, say an order with a total prep time for order 6 is 10min and the total prep time of order 7 is 2min. The order 7 will be done before the order 6 and will need to be moved to the completedQueue. And while queues are great for FIFO, they aren't great if we need to access a value, especially if we already know the index. This is due to the fact that queues are usually built on top of the linked list paradigm, where to get to a certain value it must traverse the list til that value is found.
 
-**Bottleneck fixes below are not implemented in the pseudo-code below**
-
 Using this {orderId: [queueNum, index]} data structure allows us to cut out finding where a order is in a array fast, but anytime we update the queue or list we will need to update the index parameter, having O(N) time complexity, which is our next bottleneck. Plus, the index doesn't really have any effect on the queue since we have to traverse the queue anyway, so in the pseudo-code below it was decided to not update the index for orders in queues.
 
 To fix this bottleneck, a binary search algorithm could be used to find the orderId in the inProcessList and the deliveredList. This would get rid of the need for the index in the statusMap leaving {orderId: queueNum}, and would only have a O(log(N)) time complexity. This means we will need to sort the ArrayLists as we insert new elements but this is much easier to do as the program will insert one at a time.
 
     statusMap = { 1: 4, 2: 4, 3: 3, 4: 3, 5: 4, 6: 2, 7: 3, 8: 2, 9: 2, 10: 1, 11: 1, 12: 1, 13: 1} // much easier to look at!
+
+**Bottleneck fixes below are not implemented in the pseudo-code below**
 
 The Next bottleneck is when deleting an order from the orderQueue, as said a queue needs to traverse the entire length until the order is found, then remove it. There maybe a solution to this one, but it was decided to not dive to deeply into this one as submission date was approaching. But one thought would be to start a thread to delete the order as to not hold up the project, but LinkedList, ArrayList, and HashMap are _not_ thread safe. So, maybe using HashTable instead of HashMap and Collections.synchronizedList() to synchronize the List objects.
 
