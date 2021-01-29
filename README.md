@@ -84,7 +84,7 @@ Why use an array for orders being processed or delivered? Unlike the queues desc
 
 Using this {orderId: [queueNum, index]} data structure allows us to cut out finding where a order is in an array fast, but anytime we update the queue or list we will need to update the index parameter, having O(N) time complexity, which is our next bottleneck. Plus, the index doesn't really have any effect on the queue since we have to traverse the queue anyway.
 
-To fix this bottleneck, a binary search algorithm could be used to find the orderId in the inProcessList and the deliveredList. This would get rid of the need for the index in the statusMap leaving {orderId: queueNum}, and would only have a O(log(N)) time complexity. This means we will need to sort the ArrayLists as we insert new elements. With a merge sort principled insert we would have O(N log(N)) time complexity for the sorting function.
+To fix this bottleneck, a binary search algorithm could be used to find the orderId in the inProcessList and the deliveredList. This would get rid of the need for the index in the statusMap leaving {orderId: queueNum}, and would only have a O(log(N)) time complexity. This means we will need to sort the ArrayLists as we insert new elements. We could use the binary search algorithm yet again to find the index of where to insert the new element.
 
     orderQueue = [13, 10, 11, 12]
     inProcessList = [6, 8, 9]     //This one just happened to be already sorted
@@ -283,7 +283,7 @@ In the below methods not all error/logic checks are shown as this is just an ove
         processOrder() {
           // remove first order from orderQueue
           // update order.chefId = user.id
-          // add order.id to inProcessList using merge sort principles
+          // add order.id to inProcessList using binary tree search to find the index to insert
           // update statusMap key: order.id, value: 2
         }
 
@@ -299,7 +299,7 @@ In the below methods not all error/logic checks are shown as this is just an ove
 
         deliveredOrder() {
           // remove order first order from completedQueue
-          // add order.id to deliveredList using merge sort principles
+          // add order.id to deliveredList using binary tree search to find the index to insert
           // add key: order.id, value: 4
         }
 
