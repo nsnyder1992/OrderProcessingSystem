@@ -9,39 +9,27 @@ class OrderProcessingSystem {
         int testTimes = 1000;
         int testItems = 100000;
 
-        // create orders
         for (int i = 0; i < testItems; i++) {
+            // create orders
             oc.createOrder(i);
-        }
 
-        // process orders
-        for (int i = 0; i < (testItems / 2); i++) {
-            oc.processOrder();
-        }
+            // process order
+            if (i < testItems / 2) {
+                oc.processOrder();
 
-        // complete orders
-        ArrayList<Integer> inProcessList = oc.getInProcessList();
-        for (int i = 0; i < (inProcessList.size() - (testItems / 4)); i += 2) {
-            int orderId = inProcessList.get(i);
-            oc.completeOrder(orderId);
-        }
+                // complete order
+                if (i % 4 == 0) {
+                    oc.completeOrder(i);
 
-        // delivered orders
-        for (int i = 0; i < (testItems / 100); i++) {
-            oc.deliveredOrder();
-        }
+                    // deliver order
+                    if (i % 10 == 0) {
+                        oc.deliveredOrder();
 
-        // delete orders
-        ArrayList<Integer> deliveredList = oc.getDeliveredList();
-        ArrayList<Integer> removeList = new ArrayList<>();
-
-        for (int i = 0; i < deliveredList.size(); i += 4) {
-            int orderId = deliveredList.get(i);
-            removeList.add(orderId);
-        }
-
-        for (int orderId : removeList) {
-            oc.deleteOrder(orderId, false);
+                        if (i % 2 == 0)
+                            oc.deleteOrder(i, false);
+                    }
+                }
+            }
         }
 
         // Test search
