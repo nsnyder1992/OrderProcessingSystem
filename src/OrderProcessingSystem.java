@@ -6,22 +6,26 @@ class OrderProcessingSystem {
     public void test() {
         OrderController oc = new OrderController();
 
-        // init stats
-        long duration = 0;
-        long max = 0;
-        long min = 0;
-
         // init test params
         int testTimes = 10000;
         int testItems = 100000; // no less than 100
 
+        // init stats
+        long time = 0;
+        long startTime = 0;
+        long endTime = 0;
+        long duration = 0;
+        long max = 0;
+        long min = 0;
+
         // init random variables
         Random rand = new Random();
         int ten = 10;
-        int processRand = (int) (Math.random() * (ten - 1) + 1);
-        int completeRand = (int) (Math.random() * (ten - 1) + 1);
-        int deliveredRand = (int) (Math.random() * (ten - 1) + 1);
-        int deletedRand = (int) (Math.random() * (ten - 1) + 1);
+        int processRand = (int) (Math.random() * (ten - 2) + 2);
+        int completeRand = (int) (Math.random() * (ten - 2) + 2);
+        int deliveredRand = (int) (Math.random() * (ten - 2) + 2);
+        int deletedRand = (int) (Math.random() * (ten - 2) + 2);
+        int searchValue = rand.nextInt(testItems);
 
         System.out.println("Starting Test...");
         // generate test sample
@@ -51,18 +55,21 @@ class OrderProcessingSystem {
         // Test search
         for (int i = 0; i < testTimes; i++) {
 
-            int searchValue = rand.nextInt(testItems);
+            searchValue = rand.nextInt(testItems);
 
-            long startTime = System.nanoTime();
+            startTime = System.nanoTime();
             oc.getOrder(searchValue);
-            long endTime = System.nanoTime();
+            endTime = System.nanoTime();
 
-            max = (endTime - startTime) > max ? (endTime - startTime) : max;
-            min = (endTime - startTime) < min ? (endTime - startTime) : min;
+            time = (endTime - startTime);
+
+            max = time > max ? time : max;
+            min = time < min ? time : min;
             if (i == 0)
-                min = (endTime - startTime);
-            duration = i == 0 ? (endTime - startTime) : ((endTime - startTime) + duration) / 2;// divide by 1000000 for
-                                                                                               // ms;
+                min = time;
+
+            duration = i == 0 ? time : (time + duration) / 2;// divide by 1000000 for
+                                                             // ms;
         }
 
         int orderQueueSize = oc.getOrderQueue().size();
