@@ -7,7 +7,7 @@ class OrderProcessingSystem {
         long duration = 0;
         OrderController oc = new OrderController();
         int testTimes = 1000;
-        int testItems = 100000;
+        int testItems = 100000; // no less than 100
 
         for (int i = 0; i < testItems; i++) {
             // create orders
@@ -48,7 +48,20 @@ class OrderProcessingSystem {
 
         }
 
-        System.out.println(String.format("Average Duration: %d ns", duration));
+        int orderQueueSize = oc.getOrderQueue().size();
+        int inProcessSize = oc.getInProcessList().size();
+        int completedQueueSize = oc.getCompletedQueue().size();
+        int deliveredSize = oc.getDeliveredList().size();
+        int deletedOrders = testItems - orderQueueSize - inProcessSize - completedQueueSize - deliveredSize;
+
+        System.out.println(String.format("Orders in orderQueue: %d", orderQueueSize));
+        System.out.println(String.format("Orders in inProcessList: %d", inProcessSize));
+        System.out.println(String.format("Orders in completedQueue: %d", completedQueueSize));
+        System.out.println(String.format("Orders in deliveredList: %d", deliveredSize));
+        System.out.println(String.format("Deleted Orders: %d", deletedOrders));
+
+        System.out.println(String.format("Average Time to find a Random order: %d ns", duration));
+
     }
 
     public static void main(String args[]) {
