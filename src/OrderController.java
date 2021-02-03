@@ -38,22 +38,25 @@ public class OrderController {
     }
 
     public int getOrder(int orderId) {
-        int listId = getOrderStatus(orderId);
+        int status = getOrderStatus(orderId);
 
-        if (listId == 1) {
+        // based on status find index
+        if (status == 1) {
             return orderQueue.indexOf(orderId);
-        } else if (listId == 2) {
+        } else if (status == 2) {
             return inProcessList.indexOf(orderId);
-        } else if (listId == 3) {
+        } else if (status == 3) {
             return completedQueue.indexOf(orderId);
-        } else if (listId == 4) {
+        } else if (status == 4) {
             return deliveredList.indexOf(orderId);
         }
 
+        // if not found return -1
         return -1;
     }
 
     public int getOrderStatus(int orderId) {
+        // if not found in keys return -1
         if (statusMap.get(orderId) == null)
             return -1;
         return statusMap.get(orderId);
@@ -62,7 +65,6 @@ public class OrderController {
     public void processOrder() {
         int orderId = orderQueue.removeFirst();
         statusMap.put(orderId, 2); // orderId: "2" for inProcessList
-
         inProcessList.add(orderId);
     }
 
@@ -71,11 +73,12 @@ public class OrderController {
     }
 
     public void completeOrder(int orderId) {
+        // if not in inProcessList do nothing
         if (getOrderStatus(orderId) != 2)
             return;
+
         int index = inProcessList.indexOf(orderId);
         inProcessList.remove(index);
-
         completedQueue.add(orderId);
         statusMap.put(orderId, 3); // orderId: "3" for completedQueue
 
@@ -105,10 +108,14 @@ public class OrderController {
             // set order.canceled = true in database
         }
 
+        // get status and where
         int status = getOrderStatus(orderId);
+        if (status == -1)
+            return;
+
         int index = getOrder(orderId);
 
-        // update queues/lists
+        // update queue/list
         if (status == 1) {
             orderQueue.remove(index);
         } else if (status == 2) {
