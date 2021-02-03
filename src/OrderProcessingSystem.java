@@ -33,7 +33,7 @@ class OrderProcessingSystem {
         }
 
         // Test search
-        for (int j = 0; j < testTimes; j++) {
+        for (int i = 0; i < testTimes; i++) {
 
             Random rand = new Random();
             int upperbound = testItems;
@@ -43,7 +43,8 @@ class OrderProcessingSystem {
             oc.getOrder(searchValue);
             long endTime = System.nanoTime();
 
-            duration = ((endTime - startTime) + duration) / 2;// divide by 1000000 for ms;
+            duration = i == 0 ? (endTime - startTime) : ((endTime - startTime) + duration) / 2;// divide by 1000000 for
+                                                                                               // ms;
 
         }
 
