@@ -17,6 +17,12 @@ class OrderProcessingSystem {
         long duration = 0;
         long max = 0;
         long min = 0;
+        int maxOrder = 0;
+        int minOrder = 0;
+        int maxOrderStatus = 0;
+        int minOrderStatus = 0;
+        int maxOrderIndex = 0;
+        int minOrderIndex = 0;
 
         // init random variables
         Random rand = new Random();
@@ -27,14 +33,15 @@ class OrderProcessingSystem {
         int deletedRand = (int) (Math.random() * (ten - 2) + 2);
         int searchValue = rand.nextInt(testItems);
 
-        System.out.println("Starting Test...");
+        System.out.println("Starting Test!");
+        System.out.print("Generating Test Sample...");
         // generate test sample
         for (int i = 0; i < testItems; i++) {
             // create orders
             oc.createOrder(i);
 
             // process order
-            if (i < testItems / processRand) {
+            if (i < testItems - (testItems / processRand)) {
                 oc.processOrder();
 
                 // complete order
@@ -51,26 +58,45 @@ class OrderProcessingSystem {
                 }
             }
         }
+        System.out.println("Complete!");
 
         // Test search
+        System.out.print("Testing Search Method...");
         for (int i = 0; i < testTimes; i++) {
 
             searchValue = rand.nextInt(testItems);
 
             startTime = System.nanoTime();
-            oc.getOrder(searchValue);
+            int orderIndex = oc.getOrder(searchValue);
             endTime = System.nanoTime();
 
             time = (endTime - startTime);
 
-            max = time > max ? time : max;
-            min = time < min ? time : min;
-            if (i == 0)
+            if (time > max) {
+                max = time;
+                maxOrderStatus = oc.getOrderStatus(searchValue);
+                maxOrder = searchValue;
+                maxOrderIndex = orderIndex;
+            }
+
+            if (time < min) {
                 min = time;
+                minOrderStatus = oc.getOrderStatus(searchValue);
+                minOrder = searchValue;
+                minOrderIndex = orderIndex;
+            }
+
+            if (i == 0) {
+                min = time;
+                minOrderStatus = oc.getOrderStatus(searchValue);
+                minOrder = searchValue;
+                minOrderIndex = orderIndex;
+            }
 
             duration = i == 0 ? time : (time + duration) / 2;// divide by 1000000 for
                                                              // ms;
         }
+        System.out.println("Complete!");
 
         int orderQueueSize = oc.getOrderQueue().size();
         int inProcessSize = oc.getInProcessList().size();
@@ -89,8 +115,10 @@ class OrderProcessingSystem {
         System.out.println("");
         System.out.println("Time statistics:");
         System.out.println(String.format("Average Time to find a Random order: %d ns", duration));
-        System.out.println(String.format("Maximum Time to find a Random order: %d ns", max));
-        System.out.println(String.format("Minimum Time to find a Random order: %d ns", min));
+        System.out.println(String.format("Maximum Time: %d ns, Order: %d, Order Status: %d, Order Index: %d", max,
+                maxOrder, maxOrderStatus, maxOrderIndex));
+        System.out.println(String.format("Minium Time: %d ns, Order: %d, Order Status: %d, Order Index: %d", min,
+                minOrder, minOrderStatus, minOrderIndex));
 
     }
 
